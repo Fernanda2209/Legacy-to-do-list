@@ -1,41 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 
-const Form = ({ addTodo }) => {
-    const [inputValue, setInputValue] = useState("");
 
-    const handleInputChange = (e) => {
-        setInputValue(e.target.value);
-    };
+function Form(props) {
+  const [input, setInput] = useState(props.edit ? props.edit.value : '');
 
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
+  const inputRef = useRef(null);
 
-        if(inputValue.trim() === "") return;
+  useEffect(() => {
+    inputRef.current.focus();
+  });
 
-        addTodo({ title: inputValue, completed: false });
-        setInputValue("");
-    };
-    
-    return (
-        <form className="ui form" onSubmit={handleFormSubmit}>
-            <div className="ui grid center aligned">
-                <div className="row">
-                    <div className="column five wide">
-                        <input
-                            value={inputValue}
-                            onChange={handleInputChange}
-                            type="text"
-                            placeholder="Enter something to do..."
-                        />
-                    </div>
-                    
-                    <div className="column one wide">
-                        <button type="submit" className="ui button circular icon green"><i className="white plus icon"></i></button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    );
-};
+  const handleChange = e => {
+    setInput(e.target.value);
+  };
+
+  const handleSubmit = e => {
+    e.preventDefault();
+
+    props.onSubmit({
+      id: Math.floor(Math.random() * 10000),
+      text: input
+    });
+    setInput('');
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className='todo-form'>
+      {props.edit ? (
+        <>
+          <input
+            placeholder='Update your item'
+            value={input}
+            onChange={handleChange}
+            name='text'
+            ref={inputRef}
+            className='todo-input edit'
+          />
+          <button onClick={handleSubmit} className='todo-button edit'>
+            Actualizar
+          </button>
+        </>
+      ) : (
+        <>
+          <input
+            placeholder='Escribe algo para hacer ...'
+            value={input}
+            onChange={handleChange}
+            name='text'
+            className='todo-input'
+            ref={inputRef}
+          />
+          <button onClick={handleSubmit} className='todo-button'>
+            Añadir
+          </button>
+        </>
+      )}
+    </form>
+  );
+}
 
 export default Form;

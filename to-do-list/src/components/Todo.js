@@ -1,80 +1,44 @@
-import React, { useState } from "react";
+import React, {useState} from 'react'
+import Form from './Form.js'
+import { RiCloseCircleLine } from 'react-icons/ri';
+import { TiEdit } from 'react-icons/ti';
+import axios from 'axios';
 
-const Todo = ({ title, completed, removeTodoItemProp, editTodoItemProp }) => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [value, setValue] = useState(title);
-    const [tempValue, setTempValue] = useState(title);
-    const [completedState, setCompleted] = useState(completed);
 
-    const handleDivDoubleClick = () => {
-        setIsEditing(true);
-    };
 
-    const handleInputKeyDown = (e) => {
-        const key = e.keyCode;
+const Todo = ({todos,completeTodo, removeTodo, updateTodo}) => {
+    const [edit, setEdit] = useState({
+        id: null,
+        value: ''
+    });
 
-        if(key === 13) {
-            editTodoItemProp({ title: tempValue });
-            setValue(tempValue);
-            setIsEditing(false);
-        } else if(key === 27) {
-            setTempValue(value);
-            setIsEditing(false);
-        }
-    };
-
-    const handleInputOnChange = (e) => {
-        setTempValue(e.target.value);
-    };
-
-    const handleButtonClick = () => {
-        setCompleted((oldCompleted) => {
-            const newState = !oldCompleted;
-            editTodoItemProp({ completed: newState });
-            return newState;
+    const submitUpdate = value => {
+        updateTodo(edit.id, value)
+        setEdit({
+            id: null,
+            value: ''
         });
     };
 
-    return (
-        <div className="row">
-            {
-            isEditing ?
-                <div className="column seven wide">
-                    <div className="ui input fluid">
-                        <input
-                            onChange={handleInputOnChange}
-                            onKeyDown={handleInputKeyDown}
-                            autoFocus={true}
-                            value={tempValue}
-                        />
-                    </div>
-                </div> :
-                <>
-                    <div className="column five wide" onDoubleClick={handleDivDoubleClick}>
-                        <h2 className={"ui header" + (completedState ? " green" : "")}>{value}</h2>
-                    </div>
+  if (edit.id){
+      return <Form edit={edit} onSubmit={submitUpdate} />;
 
-                    <div className="column one wide">
-                        <button
-                            className={"ui button circular icon" + (completedState ? " blue" : " green")}
-                            onClick={handleButtonClick}
-                        >
-                            <i className="white check icon"></i>
-                        </button>
-                    </div>
+  }
 
-                    <div className="column one wide">
-                        <button
-                            onClick={removeTodoItemProp}
-                            className="ui button circular icon red"
-                        >
-                            <i className="white remove icon"></i>
-                        </button>
-                    </div>
-                </>
-            }
-        </div>
-    );
+  return todos.map((todo, index) => (
+      <div className={todo.isComplete ? 'todo-row complete' : 'todo-row'} key={index}>
+          <div key={todo.id} onClick={() => completeTodo(todo.id)}>
+              {todo.text}
+          </div>
+          <div className='icons'>
+              <RiCloseCircleLine onClick={() => removeTodo(todo.id)}
+              className='delete-icon'/>
+              <TiEdit onClick={() => setEdit({ id: todo.id, value: todo.text})}
+              className='edit-icon' />
+
+          </div>
+      </div>
+  ));
 };
 
 export default Todo;
