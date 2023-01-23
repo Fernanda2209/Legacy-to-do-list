@@ -47,7 +47,7 @@ function List() {
     
     <div>
         <img src={Logo}/>
-        <h1>TO DO LIST</h1>
+        <h1 className='tit-to-do'>TO DO LIST</h1>
         <Form onSubmit={addTodo} />
         <Todo todos={todos} completeTodo={completeTodo}  
         removeTodo={removeTodo} updateTodo={updateTodo}/>
